@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, Text, DateTime
 from ..database import Base
 
 class User(Base):
@@ -10,5 +10,5 @@ class User(Base):
     password_hash = Column(String)
     created_at = Column(
         DateTime(timezone=True),
-        server_default=text("CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Shanghai'")
+        server_default=Text("CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Shanghai'")
     ) 
