@@ -17,5 +17,3 @@ class ResponseTransaction(BaseTransaction):
 
     class Config:
         orm_mode=True
-
-
