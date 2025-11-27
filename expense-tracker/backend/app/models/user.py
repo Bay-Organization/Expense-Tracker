@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, text, DateTime
 from ..database import Base
 
 class User(Base):
@@ -11,5 +11,5 @@ class User(Base):
         String)
     created_at = Column(
         DateTime(timezone=True),
-        server_default=Text("CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Shanghai'")
+        server_default=text("CURRENT_TIMESTAMP")
     ) 

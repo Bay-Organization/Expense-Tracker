@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime, Float, Date
+from sqlalchemy import Column, Integer, String, ForeignKey, text, DateTime, Float, Date
 from ..database import Base
 
 
@@ -12,4 +12,4 @@ class Transaction(Base):
     date = Column(Date)
     user_id = Column(Integer,ForeignKey("users.id"))
     category_id = Column(String, ForeignKey("categories.id"))
-    created_at = Column(DateTime(timezone=True), server_default=Text("CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Shanghai"))
+    created_at = Column(DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
