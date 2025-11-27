@@ -30,14 +30,19 @@ def register(user : CreateUser, db : Session = Depends(get_db)):
 
     return new_user
 
+#Login
 @router.post("/login")
-def login(user:CreateUser , db : Session= Depends(get_db)):
-
-    db_user = db.query(User).filter(User.email == user.email)
+def login(user: CreateUser, db: Session = Depends(get_db)):
+    
+    db_user = db.query(User).filter(User.email == user.email).first()
 
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid email or password")
     
-    token = create_access_token({"sub":str(db_user.id)})
+    if not verify_password(user.password, db_user.password_hash):
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+    
+    token = create_access_token({"sub": str(db_user.id)})
 
     return {"access_token": token, "token_type": "bearer"}
+
