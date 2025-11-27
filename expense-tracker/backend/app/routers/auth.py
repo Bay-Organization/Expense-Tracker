@@ -1,24 +1,33 @@
-from datetime import datetime, timedelta
-from jose import JWTError, jwt
-from passlib.context import CryptContext
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from app.database import get_db
+from app.models.user import User
+from app.schemas.user import CreateUser, ResponseUser
+from app.utils.auth import hash_password, verify_password, create_access_token
 
-SECRET_KEY = "supersecretkey213"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+router = APIRouter(prefix="/auth",tags=["Auth"])
 
-def hash_password(password: str):
-    return pwd_context.hash(password)
+#Register
 
-def verify_password(plain: str, hashed: str):
-    return pwd_context.verify(plain, hashed)
+@router.post("/register", response_model = ResponseUser)
+def register(user: CreateUser, db: Session = Depends(get_db)):
 
-def create_access_token(data: dict):
-    to_encode = data.copy()
+    #Email check wheather its exicts
+    existing = db.query(User).filter(User.email == user.email).first()
+    if(existing):
+        raise HTTPException(status_code=400,detail="Email already registered")
 
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp":expire})
+    hashed_pw = hash_password(user.password)
 
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    new_user = User(
+        username = user.name,
+        email = user.email,
+        password_hash = hashed_pw
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
