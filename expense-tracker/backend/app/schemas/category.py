@@ -1,14 +1,14 @@
 from pydantic import BaseModel
 
-class CategoryBase(BaseModel):
+class BaseCategory(BaseModel):
     name : str
 
-class CategoryCreate(CategoryBase):
-    pass
+class CreateCategory(BaseCategory):
+    pass 
 
-class CategoryResponse(CategoryBase):
+class ResponseCategory(BaseCategory):
     id : int
-
+    
     class Config:
-        orm_mode = True
+        orm_mode=True
         
