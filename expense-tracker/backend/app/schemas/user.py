@@ -5,7 +5,7 @@ class BaseUser(BaseModel):
     email : EmailStr
 
 class CreateUser(BaseUser):
-    password:str
+    password : str
 
 class ResponseUser(BaseUser):
     id : int 
