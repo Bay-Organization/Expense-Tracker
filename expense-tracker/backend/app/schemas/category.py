@@ -11,5 +11,4 @@ class ResponseCategory(BaseCategory):
     
     class Config:
         orm_mode=True
-
         
