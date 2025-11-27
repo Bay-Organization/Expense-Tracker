@@ -1,9 +1,9 @@
-#💸 Expense Tracker API
+# 💸 Expense Tracker API
 
 A clean and powerful backend-only expense tracking system built with FastAPI.
 Designed for speed, clarity, and real-world usage.
 
-##🚀 Features
+## 🚀 Features
 
 🔐 User Authentication (JWT-based login & register)
 
