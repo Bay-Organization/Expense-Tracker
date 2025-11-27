@@ -1,16 +1,19 @@
 from pydantic import BaseModel
 from datetime import date
 
-class TransactionBase(BaseModel):
+class BaseTransaction(BaseModel):
     amount : float
     type : str
     description : str | None = None
-    date : date
+    date  : date
     category_id : int
 
-class TransactionCreate(TransactionBase):
+class CreateTransaction(BaseTransaction):
     pass
 
-class TransactionResponse(TransactionBase):
-    id : int 
-    user_id : int 
+class ResponseTransaction(BaseTransaction):
+    id : int
+    user_id : int
+
+    class Config:
+        orm_mode=True
