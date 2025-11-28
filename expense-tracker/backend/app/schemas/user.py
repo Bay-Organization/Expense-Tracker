@@ -9,7 +9,7 @@ class CreateUser(BaseUser):
 
 class ResponseUser(BaseUser):
     id : int 
-
-      class Config:
+    
+    class Config:
          orm_mode = True
    
