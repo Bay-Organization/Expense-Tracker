@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class BaseCategory(BaseModel):
     name : str
@@ -10,5 +10,5 @@ class ResponseCategory(BaseCategory):
     id : int
     
     class Config:
-        orm_mode=True
+        model_config = ConfigDict(from_attributes=True)
         

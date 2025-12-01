@@ -11,6 +11,7 @@ from app.schemas.transaction import(
     ResponseTransaction,
 )
 from app.utils.deps import get_current_user
+from app.schemas.user import LoginUser
 
 
 router = APIRouter(

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, text, DateTime, Float, Date
-from ..database import Base
+from app.database import Base
 
 
 class Transaction(Base):
