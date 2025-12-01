@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import date
 
 class BaseTransaction(BaseModel):
@@ -16,4 +16,4 @@ class ResponseTransaction(BaseTransaction):
     user_id : int
 
     class Config:
-        orm_mode=True
+        model_config = ConfigDict(from_attributes=True)
