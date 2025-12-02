@@ -9,5 +9,4 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     user_id = Column(Integer,ForeignKey("users.id"),nullable=True)
-    created_at = Column(DateTime(timezone=True),
-                         server_default=text("CURRENT_TIMESTAMP"))
+    created_at = Column(DateTime(timezone=True),server_default=text("CURRENT_TIMESTAMP"))
