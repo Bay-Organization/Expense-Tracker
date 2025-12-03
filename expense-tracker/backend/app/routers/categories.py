@@ -24,8 +24,9 @@ def create_category(category_in: CreateCategory, db: Session = Depends(get_db), 
         raise HTTPException(status_code=400, detail="Category already exists")
     
     category = CategoryModels(
-        name = category_in.name
-        user_id = current_user.id, #Link the category to the authenticated user
+        name = category_in.name,
+        #Link the category to the authenticated user
+        user_id = current_user.id, 
     )
     
     db.add(category)
