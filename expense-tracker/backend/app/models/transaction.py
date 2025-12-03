@@ -1,15 +1,14 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, text, DateTime, Float, Date
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from app.database import Base
-
 
 class Transaction(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, index=True)
-    amount = Column(Float)
-    type = Column(String)
+    amount = Column(Float, nullable=False)
+    type = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    date = Column(Date)
-    user_id = Column(Integer,ForeignKey("users.id"))
-    category_id = Column(String, ForeignKey("categories.id"))
-    created_at = Column(DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+    date = Column(Date, nullable=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"))
+    category_id = Column(Integer, ForeignKey("categories.id"))
