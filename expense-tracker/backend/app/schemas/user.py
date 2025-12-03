@@ -1,20 +1,26 @@
-from pydantic import BaseModel, EmailStr
-from pydantic import ConfigDict
+from pydantic import BaseModel, EmailStr, Field, validator
 
-class BaseUser(BaseModel):
-    username : str
-    email : EmailStr
+class CreateUser(BaseModel):
+    username: str
+    email: EmailStr
+    password: str = Field(..., max_length=72)
 
-class CreateUser(BaseUser):
-    password : str
+    @validator("password")
+    def validate_password(cls, v):
+        if len(v.encode("utf-8")) > 72:
+            raise ValueError("Password cannot exceed 72 bytes.")
+        return v
+
 
 class LoginUser(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
-class ResponseUser(BaseUser):
-    id : int 
-    
+
+class ResponseUser(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+
     class Config:
-        model_config = ConfigDict(from_attributes=True)
-   
+        orm_mode = True

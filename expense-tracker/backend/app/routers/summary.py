@@ -1,38 +1,43 @@
-from fastapi import APIRouter,HTTPException,Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from datetime import date,timedelta
+from datetime import date, timedelta
 
 from app.database import get_db
-from app.models.category import Category
 from app.models.transaction import Transaction
+from app.models.category import Category
 from app.utils.deps import get_current_user
 from app.models.user import User
 
-router=APIRouter(prefix="/summary",tags=["Summary"])
+router = APIRouter(prefix="/summary", tags=["Summary"])
 
 @router.get("/totals")
-def get_totals(
+def totals(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
-    income = db.query(func.sum(Transaction.amount)).filter(Transaction.user_id==user.id, Transaction.type == "income").scalar() or 0
-    expense = db.query(func.sum(Transaction.amount)).filter(Transaction.user_id==user.id, Transaction.type == "expense").scalar() or 0
+    income = db.query(func.sum(Transaction.amount)).filter(
+        Transaction.user_id == user.id,
+        Transaction.type == "income"
+    ).scalar() or 0
 
-    balance = income - expense
+    expense = db.query(func.sum(Transaction.amount)).filter(
+        Transaction.user_id == user.id,
+        Transaction.type == "expense"
+    ).scalar() or 0
 
     return {
-        "total income" : income,
-        "total expence" : expense,
-        "balance" : balance
+        "total_income": income,
+        "total_expense": expense,
+        "balance": income - expense
     }
 
 @router.get("/categories")
-def spending_by_category(
+def summary_by_category(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
-    results = (
+    data = (
         db.query(Category.name, func.sum(Transaction.amount))
         .join(Transaction, Transaction.category_id == Category.id)
         .filter(
@@ -43,14 +48,14 @@ def spending_by_category(
         .all()
     )
 
-    return [{"category": name, "total": total} for name, total in results]
+    return [{"category": name, "total": total} for name, total in data]
 
 @router.get("/monthly")
-def monthly_summary(
+def monthly(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
-    results = (
+    data = (
         db.query(
             func.strftime("%Y-%m", Transaction.date).label("month"),
             func.sum(Transaction.amount).label("total")
@@ -61,16 +66,16 @@ def monthly_summary(
         .all()
     )
 
-    return [{"month": m, "total": t} for m, t in results]
+    return [{"month": m, "total": t} for m, t in data]
 
 @router.get("/weekly")
-def weekly_summary(
+def weekly(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
     seven_days_ago = date.today() - timedelta(days=6)
 
-    results = (
+    data = (
         db.query(
             Transaction.date,
             func.sum(Transaction.amount)
@@ -84,5 +89,4 @@ def weekly_summary(
         .all()
     )
 
-    return [{"date": str(d), "total": t} for d, t in results]
-
+    return [{"date": str(d), "total": t} for d, t in data]
