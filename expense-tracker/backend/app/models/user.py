@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, text, DateTime
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class User(Base):
@@ -7,9 +8,10 @@ class User(Base):
     id = Column(Integer,primary_key=True,index=True)
     username = Column(String,unique=True,index=True)
     email = Column(String,unique=True,index=True)
-    password_hash = Column(
-        String)
+    password_hash = Column(String, nullable=False)
     created_at = Column(
         DateTime(timezone=True),
-        server_default=text("CURRENT_TIMESTAMP")
+        server_default=text("CURRENT_TIMESTAMP"),
     ) 
+    #Relationships
+    transactions = relationship("Transaction", backref="user")
