@@ -1,81 +1,76 @@
-from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import date
 
 from app.database import get_db
-from app.models.transaction import Transaction as TransactionModel
-from app.models.user import User
-from app.schemas.transaction import(
-    CreateTransaction,
-    ResponseTransaction,
-)
+from app.schemas.transaction import CreateTransaction,ResponseTransaction
+from app.models.transaction import Transaction
+from app.models.category import Category
 from app.utils.deps import get_current_user
-from app.schemas.user import LoginUser
+from app.models.user import User
 
+router=APIRouter(prefix="/transaction",tags=["Transaction"])
 
-router = APIRouter(
-    prefix="/transactions",
-    tags=["Transactions"],
-)
-
-@router.get("/", response_model=List[ResponseTransaction])
-def list_transactions(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    #List all Transactions for authenticated user.
-    transactions = (
-        db.query(TransactionModel)
-        .filter(TransactionModel.user_id == current_user.id)
-        .order_by(TransactionModel.date.desc())
-        .all()
-    )
-    return transactions
-
-@router.post("/", response_model=ResponseTransaction, status_code=status.HTTP_201_CREATED)
-def create_transaction(transaction_in: CreateTransaction, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    #Create transaction for authenticated user.
-    transaction = TransactionModel (
-        amount = transaction_in.amount,
-        type = transaction_in.type,
-        description = transaction_in.description,
-        date = transaction_in.date,
-        category_id = transaction_in.category_id,
-        user_id = current_user.id,
-    )
-
-    db.add(transaction)
-    db.commit()
-    db.refresh(transaction)
-    return transaction
-
-@router.get("/{transaction_id}", response_model=ResponseTransaction)
-def get_transaction(transaction_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    #Get a single transaction owned by authenticated user
-    transaction = (
-        db.query(TransactionModel).filter(TransactionModel.id == transaction_id, TransactionModel.user_id == current_user.id).first()
-    )
-    
-    if transaction is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Transaction not found",
+@router.post("/",response_model=ResponseTransaction)
+def create_transaction(
+    tx: CreateTransaction,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    category=(
+        db.query(Category).filter(
+            Category.id==tx.category_id,
+            Category.user_id==user.id
         )
-    return transaction
+    ).first()
 
-@router.delete("/{transaction_id}", status_code= status.HTTP_204_NO_CONTENT)
-def delete_transaction(transaction_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    #For deletion a transaction owned by authenticated user.
-    transaction = (
-        db.query(TransactionModel).filter(
-            TransactionModel.id == transaction_id,
-            TransactionModel.user_id == current_user.id,
-        ).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    new_tx = Transaction(
+        amount=tx.amount,
+        type=tx.type,
+        description=tx.description,
+        date=tx.date,
+        user_id=user.id,
+        category_id=tx.category_id
     )
 
-    if transaction is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail= "Transaction not found"
-        )
-    
-    db.delete(transaction)
+    db.add(new_tx)
     db.commit()
-    return None
+    db.refresh(new_tx)
+
+    return new_tx
+
+@router.get("/",response_model=list[ResponseTransaction])
+def get_transactions(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    return db.query(Transaction).filter(Transaction.user_id==user.id).order_by(Transaction.date.desc()).all()
+
+@router.get("/{tx_id}",response_model=ResponseTransaction)
+def get_transaction(
+    tx_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    tx = db.query(Transaction).filter(Transaction.id==tx_id, Transaction.user_id==user.id).first()
+
+    if not tx:
+        raise HTTPException(status_code=404, detail="Transaction not Found")
+    
+    return tx
+
+router.delete("/{tx_id}")
+def delete_transaction(
+        tx_id: int,
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
+):
+    tx = (db.query(Transaction).filter(Transaction.id==tx_id, Transaction.user_id==user.id).first())
+
+    if not tx:
+        raise HTTPException(status_code=404, detail="Transaction not Found")
+    
+    return {"message":"Transaction Deleted"}
