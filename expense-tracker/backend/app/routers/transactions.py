@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends,HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date
 
@@ -9,7 +9,7 @@ from app.models.category import Category
 from app.utils.deps import get_current_user
 from app.models.user import User
 
-router=APIRouter("/transaction",tags=["Transaction"])
+router=APIRouter(prefix="/transaction",tags=["Transaction"])
 
 @router.post("/",response_model=ResponseTransaction)
 def create_transaction(
