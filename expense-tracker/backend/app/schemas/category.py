@@ -9,3 +9,4 @@ class CategoryResponse(BaseModel):
 
     class Config:
         orm_mode = True
+        

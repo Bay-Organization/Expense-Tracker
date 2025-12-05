@@ -90,3 +90,4 @@ def weekly(
     )
 
     return [{"date": str(d), "total": t} for d, t in data]
+

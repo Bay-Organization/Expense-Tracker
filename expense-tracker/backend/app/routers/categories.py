@@ -48,3 +48,4 @@ def delete_category(
     db.delete(cat)
     db.commit()
     return {"message": "Category deleted"}
+

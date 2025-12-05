@@ -18,3 +18,4 @@ class TransactionResponse(BaseModel):
 
     class Config:
         orm_mode = True
+        
