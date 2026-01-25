@@ -42,3 +42,4 @@ def read_me(user: User = Depends(get_current_user)):
         "username": user.username,
         "email": user.email
     }
+
